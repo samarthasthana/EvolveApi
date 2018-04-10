@@ -1,17 +1,17 @@
-var express = require('express');
-var app = express();
-var bodyParser = require('body-parser');
-var morgan = require('morgan');
-var mongoose = require('mongoose');
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const mongoose = require('mongoose');
 
-var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-var config = require('./app/Configs/config'); // get our config file
-var usersRouter = require('./app/Routers/usersRouter');
+const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
+const config = require('./app/Configs/config'); // get our config file
+const usersRouter = require('./app/Routers/usersRouter');
 
 // =======================
 // configuration =========
 // =======================
-var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
+const port = process.env.PORT || 8080; // used to create, sign, and verify tokens
 mongoose.connect(config.database); // connect to database
 app.set('superSecret', config.secret); // secret variable
 
