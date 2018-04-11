@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 const config = require('./app/Configs/config'); // get our config file
 const usersRouter = require('./app/Routers/usersRouter');
+const authenticationRouter = require('./app/Routers/authenticationRouter');
 
 // =======================
 // configuration =========
@@ -28,6 +29,7 @@ app.get('/', function (req, res) {
 });
 
 app.use('/api/users', usersRouter);
+app.use('/api/login', authenticationRouter);
 
 // =======================
 // start the server ======

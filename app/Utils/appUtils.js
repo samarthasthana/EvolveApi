@@ -1,6 +1,8 @@
 module.exports = {
     handleError: (errMsg) => {
         console.log(errMsg);
-        return { IsError: true, Msg: errMsg };
+        return { message: errMsg };
+    },
+    verifyToken: () => {
     }
 };
