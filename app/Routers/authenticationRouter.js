@@ -11,7 +11,6 @@ const bcrypt = require('bcryptjs')
 
 // Login authentication
 router.post('/', (req, res) => {
-    debugger;
     if (req.body && req.body.name && req.body.password) {
         User.findOne(
             {
