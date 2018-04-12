@@ -1,2 +1,5 @@
 node_modules/*
 .\app\Configs\*
+app/Configs/config-dev.js
+app/Configs/config-test.js
+
