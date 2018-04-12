@@ -5,7 +5,7 @@ const utils = require('../Utils/appUtils');
 const config = require('../Configs/config');
 const bcrypt = require('bcryptjs');
 
-const usersValidationRules = require('../Validations/Rules/usersValidations');
+const userValidationRules = require('../Validations/Rules/userValidations');
 
 
 // Get All Users: 
@@ -36,7 +36,7 @@ router.post('/', utils.verifyUserAuth, (req, res) => {
         res.sendStatus(403);
     }
 
-    const ret = usersValidationRules.createUserValidate(req, res);
+    const ret = userValidationRules.createUserValidate(req, res);
     if (ret) {
         try {
             requestedUser = {

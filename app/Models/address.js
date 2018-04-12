@@ -8,8 +8,6 @@ module.exports = mongoose.model('Address', new Schema({
     state: String,
     country: String,
     zip: String,
-    resume: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Resume'
-    }
+    email: String,
+    phone: String
 }));

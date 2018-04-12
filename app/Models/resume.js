@@ -6,5 +6,17 @@ module.exports = mongoose.model('Resume', new Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    address: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address'
+    },
+    education: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Education'
+    }],
+    experience: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Experience'
+    }]
 }));

@@ -6,10 +6,5 @@ module.exports = mongoose.model('Education', new Schema({
     degreeName: String,
     fieldOfStudy: String,
     gpa: String,
-    startDate: String,
-    endDate: String,
-    resume: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Resume'
-    }
+    gradDate: Date
 }));
