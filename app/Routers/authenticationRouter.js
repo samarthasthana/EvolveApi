@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 const User = require('../Models/user'); // get our mongoose model
 const utils = require('../Utils/appUtils')
-const config = require('../Configs/config')
+const config = require('../Configs/config-dev')
 const bcrypt = require('bcryptjs')
 
 

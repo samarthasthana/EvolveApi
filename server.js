@@ -4,28 +4,32 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
-const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-const config = require('./app/Configs/config'); // get our config file
+const jwt = require('jsonwebtoken');
+const configDev = require('./app/Configs/config-dev');
+const configTest = require('./app/Configs/config-test');
 
 const usersRouter = require('./app/Routers/usersRouter');
 const resumeRouter = require('./app/Routers/resumeRouter');
 const authenticationRouter = require('./app/Routers/authenticationRouter');
 
-// =======================
-// configuration =========
-// =======================
-const port = process.env.PORT || 8080; // used to create, sign, and verify tokens
-mongoose.connect(config.database); // connect to database
-app.set('superSecret', config.secret); // secret variable
+const port = process.env.PORT || 8080;
+
+if (process.env.NODE_ENV === 'test') {
+    mongoose.connect(configTest.database);
+    app.set('superSecret', configTest.secret);
+} else {
+    mongoose.connect(configDev.database);
+    app.set('superSecret', configDev.secret);
+}
+
 
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// use morgan to log requests to the console
+// use morgan to log requests to the console <needs research>
 app.use(morgan('dev'));
 
-// basic route
 app.get('/', function (req, res) {
     res.send('Hello! The API is at http://localhost:' + port + '/api');
 });
@@ -35,7 +39,9 @@ app.use('/api/login', authenticationRouter);
 app.use('/api/resume', resumeRouter);
 
 // =======================
-// start the server ======
+// Ready Player One!!
 // =======================
 app.listen(port);
 console.log('Magic happens at http://localhost:' + port); 
+
+module.exports = app; // for testing
