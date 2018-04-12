@@ -1,92 +1,121 @@
 const express = require('express');
-const app = express();
 const router = express.Router();
-const bodyParser = require('body-parser');
-const morgan = require('morgan');
-const mongoose = require('mongoose');
+const User = require('../Models/user');
+const utils = require('../Utils/appUtils');
+const config = require('../Configs/config');
+const bcrypt = require('bcryptjs');
 
-const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-const User = require('../Models/user'); // get our mongoose model
-const utils = require('../Utils/appUtils')
-const config = require('../Configs/config')
-const bcrypt = require('bcryptjs')
+const userValidationRules = require('../Validations/Rules/userValidations');
 
 
 // Get All Users: 
-router.get('/', (req, res) => {
-    User.find((err, users) => {
-        if (err) {
-            res.json(utils.handleError(`Error fetching all users, ${err.msg}`));
-        } else {
-            res.json(users);
+router.get('/', utils.verifyUserAuth, (req, res) => {
+    try {
+        //If not authorized then forbidden
+        if (!req.decodedUser || !req.decodedUser.user) {
+            res.sendStatus(403);
         }
-    });
+
+        User.find((err, users) => {
+            if (err) {
+                res.status(500).end(utils.handleError(`Error fetching all users, ${err.msg}`));
+            } else {
+                res.json(users);
+            }
+        });
+    } catch (error) {
+        utils.handleError(`Internal server error, ${error}`)
+        res.sendStatus(500);
+    }
 });
 
-
 //Create new User
-router.post('/', (req, res) => {
-    if (req.body) {
+router.post('/', utils.verifyUserAuth, (req, res) => {
+    //If not authorized then forbidden, If not admin then admin creation is forbidden
+    if (!req.decodedUser || !req.decodedUser.user || (req.decodedUser.user.admin !== req.body.admin)) {
+        res.sendStatus(403);
+    }
+
+    const ret = userValidationRules.createUserValidate(req, res);
+    if (ret) {
         try {
             requestedUser = {
-                name: req.body.name,
+                username: req.body.username,
                 password: bcrypt.hashSync(req.body.password, config.salt),
-                admin: false
+                admin: true
             }
             User.create(requestedUser, (err, user) => {
                 if (err) {
-                    res.json(utils.handleError(`Error creating user, ${err.msg}`));
+                    res.status(500).end(utils.handleError(`Error creating user, ${err.msg}`));
                 }
                 else {
                     res.json(user);
                 }
             });
         } catch (error) {
-            res.json(utils.handleError(`Error creating user, ${error.msg}`));
+            res.status(500).end(utils.handleError(`Error creating user, ${err.msg}`));
         }
-    } else {
-        res.json(utils.handleError('No request body found'));
     }
 });
 
 // Update a User 
-router.put('/:id', (req, res) => {
-    if (req.params.id) {
-        const user = User.findById(req.params.id, (err, user) => {
-            return err ? {} : user;
-        });
-        if (user) {
-            if (req.body.password) {
-                req.body.password = bcrypt.hashSync(req.body.password, config.salt);
+router.put('/:id', utils.verifyUserAuth, (req, res) => {
+    debugger;
+    try {
+        // If not admin then forbidden
+        if (!req.decodedUser || !req.decodedUser.user || !req.decodedUser.user.admin) {
+            res.sendStatus(403);
+        }
+
+        if (req.params.id) {
+            const user = User.findById(req.params.id, (err, user) => {
+                return err ? {} : user;
+            });
+            if (user) {
+                if (req.body.password) {
+                    req.body.password = bcrypt.hashSync(req.body.password, config.salt);
+                }
+                const requestedUser = Object.assign({}, user, req.body);
+                User.findByIdAndUpdate(req.params.id, requestedUser, (err, user) => {
+                    if (err) {
+                        res.status(500).end(utils.handleError(`User not updated, ${err}`));
+                    } else {
+                        res.json(user);
+                    }
+                });
+            } else {
+                res.status(400).end(utils.handleError('User not found, update failed'));
             }
-            const requestedUser = Object.assign({}, user, req.body);
-            User.findByIdAndUpdate(req.params.id, requestedUser, (err, user) => {
+        } else {
+            res.status(400).end(utils.handleError('Invalid parameter, update failed'));
+        }
+    } catch (error) {
+        res.status(500).end(utils.handleError(`User not updated, ${error}`));
+    }
+
+});
+
+// Delete User
+router.delete('/:id', utils.verifyUserAuth, (req, res) => {
+    try {
+        // If not authorized then forbidden
+        if (!req.decodedUser || !req.decodedUser.user || !req.decodedUser.admin) {
+            res.sendStatus(403);
+        }
+
+        if (req.params.id) {
+            User.findOneAndRemove(req.params.id, (err, user) => {
                 if (err) {
-                    res.json(utils.handleError(`User not updated, ${err}`));
+                    res.status(500).end(utils.handleError(`User not deleted, ${err}`));
                 } else {
                     res.json(user);
                 }
             });
         } else {
-            res.json(utils.handleError('User not found, update failed'));
+            res.status(400).end(utils.handleError('Invalid parameter, delete failed'));
         }
-    } else {
-        res.json(utils.handleError('No user id found'));
-    }
-});
-
-// Delete User
-router.delete('/:id', (req, res) => {
-    if (req.params.id) {
-        User.findOneAndRemove(req.params.id, (err, user) => {
-            if (err) {
-                res.json(utils.handleError(`User not deleted, ${err}`));
-            } else {
-                res.json(user);
-            }
-        });
-    } else {
-        res.json(utils.handleError('No user id found'));
+    } catch (error) {
+        res.status(500).end(utils.handleError(`Internal server error, ${error}`));
     }
 });
 
