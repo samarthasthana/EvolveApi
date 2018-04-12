@@ -1,5 +1,5 @@
 const appConstants = require('../Constant/constants');
-const config = require('../Configs/config');
+const config = require('../Configs/config-dev');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
