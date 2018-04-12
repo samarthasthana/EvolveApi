@@ -7,7 +7,9 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const configDev = require('./app/Configs/config-dev');
 const configTest = require('./app/Configs/config-test');
+
 const usersRouter = require('./app/Routers/usersRouter');
+const resumeRouter = require('./app/Routers/resumeRouter');
 const authenticationRouter = require('./app/Routers/authenticationRouter');
 
 const port = process.env.PORT || 8080;
@@ -34,6 +36,7 @@ app.get('/', function (req, res) {
 
 app.use('/api/users', usersRouter);
 app.use('/api/login', authenticationRouter);
+app.use('/api/resume', resumeRouter);
 
 // =======================
 // Ready Player One!!
