@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 
 module.exports = mongoose.model('Resume', new Schema({
     name: String,
+    creationDate: Date,
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
