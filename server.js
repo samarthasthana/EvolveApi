@@ -36,7 +36,7 @@ app.get('/', function (req, res) {
 
 app.use('/api/users', usersRouter);
 app.use('/api/login', authenticationRouter);
-app.use('/api/resume', resumeRouter);
+// app.use('/api/resume', resumeRouter);
 
 // =======================
 // Ready Player One!!

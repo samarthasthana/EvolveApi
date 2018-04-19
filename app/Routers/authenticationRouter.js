@@ -7,11 +7,13 @@ const User = require('../Models/user'); // get our mongoose model
 const utils = require('../Utils/appUtils')
 const config = require('../Configs/config-dev')
 const bcrypt = require('bcryptjs')
+const userValidationRules = require('../Validations/Rules/userValidations');
 
 
 // Login authentication
 router.post('/', (req, res) => {
-    if (req.body && req.body.name && req.body.password) {
+    const ret = userValidationRules.createUserValidate(req, res);
+    if (ret) {
         User.findOne(
             {
                 name: req.body.name

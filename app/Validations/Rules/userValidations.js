@@ -4,7 +4,6 @@ const userSchema = require('../Schemas/userSchema');
 
 module.exports = {
     createUserValidate: (req, res) => {
-        debugger;
         if (req && req.body) {
             const ret = Joi.validate(req.body, userSchema.schema, { allowUnknown: false, abortEarly: false });
             if (ret.error) {
