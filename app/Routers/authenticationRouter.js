@@ -16,7 +16,7 @@ router.post('/', (req, res) => {
     if (ret) {
         User.findOne(
             {
-                name: req.body.name
+                username: req.body.username
             }, (err, user) => {
                 if (err) {
                     utils.handleError(`Failed authentication, ${err}`);

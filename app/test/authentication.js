@@ -3,32 +3,37 @@ process.env.NODE_ENV = 'test';
 const mongoose = require('mongoose');
 const User = require('../Models/user');
 const server = require('../../server');
+const appConstants = require('../Constant/constants');
+const config = require('../Configs/config-test');
+const bcrypt = require('bcryptjs');
 const chai = require('chai');
 const { expect } = require('chai')
 const chaiHttp = require('chai-http');
 const should = chai.should();
 
 
+
 chai.use(chaiHttp);
 
 //Add an Admin users for testing. 
-let adminUser = new User({
-    username: 'testAdminUser',
-    password: 'testAdmin123',
-    admin: true
-});
-
 describe('Authentication', () => {
     beforeEach((done) => { //Before each test we empty the database
         User.remove({}, (err) => {
             done();
         });
-        
+
+        let hashPwd = bcrypt.hashSync(appConstants.TestUser.password, config.salt);
+        let adminUser = new User({
+            username: appConstants.TestUser.username,
+            password: hashPwd,
+            admin: appConstants.TestUser.admin
+        });
+
         User.create(adminUser, (err, user) => {
             if (err) {
                 console.log('Test user setup failed');
             } else {
-                adminUser = Object.assign({}, user.id);
+                console.log(`Test user setup successful, Id = ${user.id}`);
             }
         });
     });
@@ -37,6 +42,7 @@ describe('Authentication', () => {
         it('it should return 400 status for empty request body', (done) => {
             chai.request(server)
                 .post('/api/login')
+                .set('content-type', 'application/json')
                 .send({})        
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -48,8 +54,9 @@ describe('Authentication', () => {
         it('it should return 400 status for no password in req body', (done) => {
             chai.request(server)
                 .post('/api/login')
+                .set('content-type', 'application/json')
                 .send({
-                    username: adminUser.username
+                    username: appConstants.TestUser.username
                 })        
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -61,8 +68,9 @@ describe('Authentication', () => {
         it('it should return 400 status for no username in req body', (done) => {
             chai.request(server)
                 .post('/api/login')
+                .set('content-type', 'application/json')
                 .send({
-                    password: adminUser.password
+                    "password": appConstants.TestUser.password
                 })        
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -76,13 +84,17 @@ describe('Authentication', () => {
         it('it should return 200 status and valid token', (done) => {
             chai.request(server)
                 .post('/api/login')
+                .set('content-type', 'application/json')
                 .send({
-                    username: adminUser.username,
-                    password: adminUser.password
+                    "username": appConstants.TestUser.username,
+                    "password": appConstants.TestUser.password
                 })
                 .end((err, res) => {
+                    console.log(res.body);
                     res.should.have.status(200);
-                    expect(res.body).to.eql({});
+                    expect(res.body.IsSuccess).to.be.true;
+                    expect(res.body.Token).to.be.a('string');
+                    res.body.Token.should.not.be.empty;
                     done();
                 });
         });
