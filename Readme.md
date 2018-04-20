@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/samarthasthana/EvolveApi.svg?branch=master)](https://travis-ci.org/samarthasthana/EvolveApi)
+
 #Documentation
 
 ## Resources: 

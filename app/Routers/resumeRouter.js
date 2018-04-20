@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../Models/user');
 const utils = require('../Utils/appUtils');
-const config = require('../Configs/config-dev');
 const bcrypt = require('bcryptjs');
 
 const userValidationRules = require('../Validations/Rules/userValidations');

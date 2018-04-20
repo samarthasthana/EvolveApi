@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 const User = require('../Models/user'); // get our mongoose model
 const utils = require('../Utils/appUtils')
-const config = require('../Configs/config-dev')
 const bcrypt = require('bcryptjs')
 const userValidationRules = require('../Validations/Rules/userValidations');
 
@@ -29,7 +28,7 @@ router.post('/', (req, res) => {
                                 res.sendStatus(500);
                             } else if (isSuccess) {
                                 const payload = { user };
-                                const token = jwt.sign(payload, config.secret, {
+                                const token = jwt.sign(payload, process.env.SECRET, {
                                     expiresIn: '60m'
                                 });
                                 res.json({ IsSuccess: true, Token: token });

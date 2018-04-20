@@ -3,25 +3,18 @@ const app = express();
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-
 const jwt = require('jsonwebtoken');
-const configDev = require('./app/Configs/config-dev');
-const configTest = require('./app/Configs/config-test');
 
 const usersRouter = require('./app/Routers/usersRouter');
 const resumeRouter = require('./app/Routers/resumeRouter');
 const authenticationRouter = require('./app/Routers/authenticationRouter');
 
-const port = process.env.PORT || 8080;
+require('dotenv').config();
 
-if (process.env.NODE_ENV === 'test') {
-    mongoose.connect(configTest.database);
-    app.set('superSecret', configTest.secret);
-} else {
-    mongoose.connect(configDev.database);
-    app.set('superSecret', configDev.secret);
-}
+const port = Number(process.env.PORT) || 8080;
 
+(process.env.NODE_ENV === 'test') ? mongoose.connect(process.env.DB_TEST) : mongoose.connect(process.env.DB_DEV);
+app.set('superSecret', process.env.SECRET);
 
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
