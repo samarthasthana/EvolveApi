@@ -59,7 +59,6 @@ router.post('/', utils.verifyUserAuth, (req, res) => {
 
 // Update a User 
 router.put('/:id', utils.verifyUserAuth, (req, res) => {
-    debugger;
     try {
         // If not admin then forbidden
         if (!req.decodedUser || !req.decodedUser.user || !req.decodedUser.user.admin) {
@@ -91,7 +90,6 @@ router.put('/:id', utils.verifyUserAuth, (req, res) => {
     } catch (error) {
         res.status(500).end(utils.handleError(`User not updated, ${error}`));
     }
-
 });
 
 // Delete User

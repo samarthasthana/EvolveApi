@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 
-const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-const User = require('../Models/user'); // get our mongoose model
+const jwt = require('jsonwebtoken');
+const User = require('../Models/user');
 const utils = require('../Utils/appUtils')
 const bcrypt = require('bcryptjs')
 const userValidationRules = require('../Validations/Rules/userValidations');
