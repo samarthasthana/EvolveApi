@@ -1,5 +1,4 @@
 const appConstants = require('../Constant/constants');
-const config = require('../Configs/config-dev');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
@@ -13,7 +12,7 @@ module.exports = {
                 const token = req.headers['authorization'].includes(appConstants.Bearer)
                     ? req.headers['authorization'].split(' ')[1] : req.headers['authorization'];
                 if (token) {
-                    const verificationStatus = jwt.verify(token, config.secret, (err, decoded) => {
+                    const verificationStatus = jwt.verify(token, process.env.SECRET, (err, decoded) => {
                         if (err) {
                             console.log(`Error verifying token, ${err}`);
                             res.status(500).end(`Error verifying token, ${err}`);

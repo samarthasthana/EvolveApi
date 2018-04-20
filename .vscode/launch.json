@@ -7,7 +7,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Mocha Tests",
+            "name": "Mocha Tests", 
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
             "args": [
                 "-u",
@@ -17,7 +17,8 @@
                 "--colors",
                 "${workspaceFolder}/app/test"
             ],
-            "internalConsoleOptions": "openOnSessionStart"
+            "internalConsoleOptions": "openOnSessionStart",
+            "envFile": "${workspaceFolder}\\.env"
         },
         {
             "type": "node",
@@ -29,7 +30,8 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}\\server.js"
+            "program": "${workspaceFolder}\\server.js",
+            "envFile": "${workspaceFolder}\\.env"
         }
     ]
 }

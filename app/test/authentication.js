@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const User = require('../Models/user');
 const server = require('../../server');
 const appConstants = require('../Constant/constants');
-const config = require('../Configs/config-test');
 const bcrypt = require('bcryptjs');
 const chai = require('chai');
 const { expect } = require('chai')
@@ -22,7 +21,7 @@ describe('Authentication', () => {
             done();
         });
 
-        let hashPwd = bcrypt.hashSync(appConstants.TestUser.password, config.salt);
+        let hashPwd = bcrypt.hashSync(appConstants.TestUser.password, Number(process.env.SALT));
         let adminUser = new User({
             username: appConstants.TestUser.username,
             password: hashPwd,

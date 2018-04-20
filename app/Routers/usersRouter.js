@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const User = require('../Models/user');
 const utils = require('../Utils/appUtils');
-const config = require('../Configs/config-dev');
 const bcrypt = require('bcryptjs');
 
 const userValidationRules = require('../Validations/Rules/userValidations');
@@ -41,7 +40,7 @@ router.post('/', utils.verifyUserAuth, (req, res) => {
         try {
             requestedUser = {
                 username: req.body.username,
-                password: bcrypt.hashSync(req.body.password, config.salt),
+                password: bcrypt.hashSync(req.body.password, Number(process.env.SALT)),
                 admin: true
             }
             User.create(requestedUser, (err, user) => {
@@ -73,7 +72,7 @@ router.put('/:id', utils.verifyUserAuth, (req, res) => {
             });
             if (user) {
                 if (req.body.password) {
-                    req.body.password = bcrypt.hashSync(req.body.password, config.salt);
+                    req.body.password = bcrypt.hashSync(req.body.password, Number(process.env.SALT));
                 }
                 const requestedUser = Object.assign({}, user, req.body);
                 User.findByIdAndUpdate(req.params.id, requestedUser, (err, user) => {
