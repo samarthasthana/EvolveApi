@@ -22,7 +22,9 @@ module.exports = {
                 console.log('Test user setup failed');
             } else {
                 console.log(`Test user setup successful, Id = ${user.id}`);
+                adminUser = Object.assign({}, {...adminUser}, {...user});
             }
         });
+        return adminUser;
     }
 };
