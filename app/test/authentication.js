@@ -20,6 +20,11 @@ describe('Authentication', () => {
         done();
     });
 
+    after((done) => {
+        testUtils.cleanTestUsers();
+        done();
+    })
+
     describe('/api/login user with incorrect req body', () => {
         it('it should return 400 status for empty request body', (done) => {
             chai.request(server)
@@ -38,7 +43,7 @@ describe('Authentication', () => {
                 .post('/api/login')
                 .set('content-type', 'application/json')
                 .send({
-                    username: appConstants.TestUser.username
+                    username: appConstants.TestAdminUser.username
                 })        
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -52,7 +57,7 @@ describe('Authentication', () => {
                 .post('/api/login')
                 .set('content-type', 'application/json')
                 .send({
-                    "password": appConstants.TestUser.password
+                    "password": appConstants.TestAdminUser.password
                 })        
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -68,8 +73,8 @@ describe('Authentication', () => {
                 .post('/api/login')
                 .set('content-type', 'application/json')
                 .send({
-                    "username": appConstants.TestUser.username,
-                    "password": appConstants.TestUser.password
+                    "username": appConstants.TestAdminUser.username,
+                    "password": appConstants.TestAdminUser.password
                 })
                 .end((err, res) => {
                     console.log(res.body);

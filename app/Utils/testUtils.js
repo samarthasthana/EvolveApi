@@ -10,11 +10,11 @@ chai.use(chaiHttp);
 module.exports = {
     setupTestUsers: () => {
         User.remove({}, (err) => { });
-        let hashPwd = bcrypt.hashSync(appConstants.TestUser.password, Number(process.env.SALT));
+        let hashPwd = bcrypt.hashSync(appConstants.TestAdminUser.password, Number(process.env.SALT));
         let adminUser = new User({
-            username: appConstants.TestUser.username,
+            username: appConstants.TestAdminUser.username,
             password: hashPwd,
-            admin: appConstants.TestUser.admin
+            admin: appConstants.TestAdminUser.admin
         });
 
         User.create(adminUser, (err, user) => {
@@ -26,5 +26,8 @@ module.exports = {
             }
         });
         return adminUser;
+    },
+    cleanTestUsers: () => {
+        User.remove({}, (err) => { });
     }
 };
