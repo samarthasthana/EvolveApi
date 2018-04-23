@@ -22,9 +22,11 @@ module.exports = {
                         }
                     });
                 } else {
+                    console.log('No token found');
                     res.sendStatus(403);
                 }
             } else {
+                console.log('No header found');
                 res.sendStatus(403);
             }
             

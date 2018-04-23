@@ -19,10 +19,12 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "chai-http": "^2.0.1",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "nyc": "^11.7.1",
+    "sinon": "^4.5.0"
   },
   "scripts": {
     "start": "SET NODE_ENV=dev && node server.js",
-    "test": "mocha  ./app/test --timeout 10000"
+    "test": "nyc mocha  ./app/test --timeout 15000"
   }
 }

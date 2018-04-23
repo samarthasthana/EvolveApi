@@ -1,8 +1,13 @@
 module.exports = {
     Bearer: 'Bearer',
-    TestUser: {
+    TestAdminUser: {
         username: 'testAdminUser',
         password: 'testAdmin123',
         admin: true
+    },
+    TestNonAdminUser: {
+        username: 'testusername',
+        password: 'testpassword',
+        admin: false
     }
 }

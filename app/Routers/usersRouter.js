@@ -31,7 +31,7 @@ router.get('/', utils.verifyUserAuth, (req, res) => {
 //Create new User
 router.post('/', utils.verifyUserAuth, (req, res) => {
     //If not authorized then forbidden, If not admin then admin creation is forbidden
-    if (!req.decodedUser || !req.decodedUser.user || (req.decodedUser.user.admin !== req.body.admin)) {
+    if (!req.decodedUser || !req.decodedUser.user || (!req.decodedUser.user.admin && req.decodedUser.user.admin != req.body.admin)) {
         res.sendStatus(403);
     }
 
@@ -59,53 +59,61 @@ router.post('/', utils.verifyUserAuth, (req, res) => {
 
 // Update a User 
 router.put('/:id', utils.verifyUserAuth, (req, res) => {
-    debugger;
-    try {
+    try {        
         // If not admin then forbidden
         if (!req.decodedUser || !req.decodedUser.user || !req.decodedUser.user.admin) {
             res.sendStatus(403);
         }
 
-        if (req.params.id) {
-            const user = User.findById(req.params.id, (err, user) => {
-                return err ? {} : user;
-            });
-            if (user) {
-                if (req.body.password) {
-                    req.body.password = bcrypt.hashSync(req.body.password, Number(process.env.SALT));
-                }
-                const requestedUser = Object.assign({}, user, req.body);
-                User.findByIdAndUpdate(req.params.id, requestedUser, (err, user) => {
-                    if (err) {
-                        res.status(500).end(utils.handleError(`User not updated, ${err}`));
+        const ret = userValidationRules.createUserValidate(req, res);
+        if (ret) {
+            if (req.params.id) {
+                User.findById(req.params.id, (err, user) => {
+                    let fetchedUser = err ? {} : user;
+                    if (fetchedUser && fetchedUser.id) {
+                        if (req.body.password) {
+                            req.body.password = bcrypt.hashSync(req.body.password, Number(process.env.SALT));
+                        }
+                        let requestedUser = Object.assign(fetchedUser,
+                            {
+                                username: req.body.username,
+                                password: req.body.password,
+                                admin: req.body.admin
+                            }
+                        );
+                        
+                        User.findByIdAndUpdate(req.params.id, requestedUser, (err, user) => {
+                            if (err) {
+                                res.status(500).end(utils.handleError(`User not updated, ${err}`));
+                            } else {
+                                res.json(requestedUser);
+                            }
+                        });
                     } else {
-                        res.json(user);
+                        res.status(400).end(utils.handleError('User not found, update failed'));                
                     }
                 });
             } else {
-                res.status(400).end(utils.handleError('User not found, update failed'));
+                res.status(400).end(utils.handleError('Invalid parameter, update failed'));
             }
-        } else {
-            res.status(400).end(utils.handleError('Invalid parameter, update failed'));
-        }
+        }        
     } catch (error) {
         res.status(500).end(utils.handleError(`User not updated, ${error}`));
     }
-
 });
 
 // Delete User
 router.delete('/:id', utils.verifyUserAuth, (req, res) => {
     try {
         // If not authorized then forbidden
-        if (!req.decodedUser || !req.decodedUser.user || !req.decodedUser.admin) {
+        if (!req.decodedUser || !req.decodedUser.user || !req.decodedUser.user.admin) {
             res.sendStatus(403);
         }
 
         if (req.params.id) {
-            User.findOneAndRemove(req.params.id, (err, user) => {
+            User.findByIdAndRemove(req.params.id, (err, user) => {
                 if (err) {
-                    res.status(500).end(utils.handleError(`User not deleted, ${err}`));
+                    res.status(400).end(utils.handleError(`User not deleted, ${err}`));
                 } else {
                     res.json(user);
                 }

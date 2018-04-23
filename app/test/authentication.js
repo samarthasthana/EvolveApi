@@ -1,10 +1,9 @@
 process.env.NODE_ENV = 'test';
 
 const mongoose = require('mongoose');
-const User = require('../Models/user');
 const server = require('../../server');
 const appConstants = require('../Constant/constants');
-const bcrypt = require('bcryptjs');
+const testUtils = require('../Utils/testUtils');
 const chai = require('chai');
 const { expect } = require('chai')
 const chaiHttp = require('chai-http');
@@ -16,26 +15,15 @@ chai.use(chaiHttp);
 
 //Add an Admin users for testing. 
 describe('Authentication', () => {
-    beforeEach((done) => { //Before each test we empty the database
-        User.remove({}, (err) => {
-            done();
-        });
-
-        let hashPwd = bcrypt.hashSync(appConstants.TestUser.password, Number(process.env.SALT));
-        let adminUser = new User({
-            username: appConstants.TestUser.username,
-            password: hashPwd,
-            admin: appConstants.TestUser.admin
-        });
-
-        User.create(adminUser, (err, user) => {
-            if (err) {
-                console.log('Test user setup failed');
-            } else {
-                console.log(`Test user setup successful, Id = ${user.id}`);
-            }
-        });
+    before((done) => { //Before each test we empty the database
+        testUtils.setupTestUsers();
+        done();
     });
+
+    after((done) => {
+        testUtils.cleanTestUsers();
+        done();
+    })
 
     describe('/api/login user with incorrect req body', () => {
         it('it should return 400 status for empty request body', (done) => {
@@ -55,7 +43,7 @@ describe('Authentication', () => {
                 .post('/api/login')
                 .set('content-type', 'application/json')
                 .send({
-                    username: appConstants.TestUser.username
+                    username: appConstants.TestAdminUser.username
                 })        
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -69,7 +57,7 @@ describe('Authentication', () => {
                 .post('/api/login')
                 .set('content-type', 'application/json')
                 .send({
-                    "password": appConstants.TestUser.password
+                    "password": appConstants.TestAdminUser.password
                 })        
                 .end((err, res) => {
                     res.should.have.status(400);
@@ -85,8 +73,8 @@ describe('Authentication', () => {
                 .post('/api/login')
                 .set('content-type', 'application/json')
                 .send({
-                    "username": appConstants.TestUser.username,
-                    "password": appConstants.TestUser.password
+                    "username": appConstants.TestAdminUser.username,
+                    "password": appConstants.TestAdminUser.password
                 })
                 .end((err, res) => {
                     console.log(res.body);

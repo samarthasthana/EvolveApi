@@ -3,3 +3,4 @@ node_modules/*
 app/Configs/config-dev.js
 app/Configs/config-test.js
 .env
+.nyc_output
