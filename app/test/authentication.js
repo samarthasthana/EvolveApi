@@ -4,24 +4,24 @@ const mongoose = require('mongoose');
 const server = require('../../server');
 const appConstants = require('../Constant/constants');
 const testUtils = require('../Utils/testUtils');
+const sinon = require('sinon');
+const bcrypt = require('bcryptjs')
 const chai = require('chai');
 const { expect } = require('chai')
 const chaiHttp = require('chai-http');
+const User = require('../Models/user');
 const should = chai.should();
-
-
 
 chai.use(chaiHttp);
 
-//Add an Admin users for testing. 
 describe('Authentication', () => {
-    before((done) => { //Before each test we empty the database
-        testUtils.setupTestUsers();
+    before((done) => { 
+        sinon.stub(User, "findOne");
         done();
     });
 
     after((done) => {
-        testUtils.cleanTestUsers();
+        User.findOne.restore();
         done();
     })
 
@@ -69,6 +69,11 @@ describe('Authentication', () => {
 
     describe('/api/login user with correct req body', () => {
         it('it should return 200 status and valid token', (done) => {
+            //Stub out the Db call
+            const fetchedUser = {...appConstants.TestAdminUser};
+            fetchedUser.password = bcrypt.hashSync(appConstants.TestAdminUser.password, Number(process.env.SALT));
+            User.findOne.yields(null, fetchedUser);
+
             chai.request(server)
                 .post('/api/login')
                 .set('content-type', 'application/json')
