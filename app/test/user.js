@@ -71,23 +71,33 @@ describe('Users', () => {
         let newServer;
         let adminUser;
         beforeEach((done) => {
-            adminUser = testUtils.setupTestUsers();
+            adminUser = {...appConstants.TestAdminUser};
             sinon.stub(appUtils, 'verifyUserAuth').returns(() => { });
-            sinon.stub(jwt, 'verify');                
-            newServer = require('../../server');                
+            sinon.stub(jwt, 'verify');
+            newServer = require('../../server');
             done();
         });
 
         afterEach((done) => {
-            testUtils.cleanTestUsers();
             appUtils.verifyUserAuth.restore();
             jwt.verify.restore();
             done();
         });
 
         describe('/GET user', () => {
+            beforeEach((done) => {
+                sinon.stub(User, 'find');
+                done();
+            });
+
+            afterEach((done) => {
+                User.find.restore();
+                done();
+            });
+            
             it('fetches users correctly', (done) => {
-                jwt.verify.yields(null, {user: adminUser});
+                jwt.verify.yields(null, { user: adminUser });
+                User.find.yields(null, [appConstants.TestAdminUser])
                 chai.request(newServer)
                     .get('/api/users')
                     .set('authorization', `${appConstants.Bearer} 123`)
@@ -167,8 +177,20 @@ describe('Users', () => {
             });
 
             describe('with valid request', () => {
+                beforeEach((done) => {
+                    sinon.stub(User, 'create');
+                    done();
+                });
+    
+                afterEach((done) => {
+                    User.create.restore();
+                    done();
+                });
+                
                 it('creates a user successfully', (done) => {
                     jwt.verify.yields(null, { user: adminUser });
+                    User.create.yields(null, {...appConstants.TestNonAdminUser});
+
                     let newUser = Object.assign({}, appConstants.TestNonAdminUser);
                     chai.request(newServer)
                         .post('/api/users')
@@ -220,8 +242,25 @@ describe('Users', () => {
             });
 
             describe('with valid id', () => {
+                beforeEach((done) => {
+                    sinon.stub(User, 'findById');
+                    sinon.stub(User, 'findByIdAndUpdate');
+                    done();
+                });
+    
+                afterEach((done) => {
+                    User.findById.restore();
+                    User.findByIdAndUpdate.restore();
+                    done();
+                });
+
                 it('updates the user correctly', (done) => {
+                    const fetchedUser = {...appConstants.TestNonAdminUser};
+                    fetchedUser.id = '1234';
                     jwt.verify.yields(null, { user: adminUser });
+                    User.findById.yields(null, fetchedUser);
+                    User.findByIdAndUpdate.yields(null, fetchedUser);
+
                     chai.request(newServer)
                         .put(`/api/users/${adminUser.id}`)
                         .set('authorization', `${appConstants.Bearer} 123`)
@@ -251,8 +290,19 @@ describe('Users', () => {
             });
 
             describe('with valid id', () => {
+                beforeEach((done) => {
+                    sinon.stub(User, 'findByIdAndRemove');
+                    done();
+                });
+    
+                afterEach((done) => {
+                    User.findByIdAndRemove.restore();
+                    done();
+                });
+
                 it('deletes the user correctly', (done) => {
                     jwt.verify.yields(null, { user: adminUser });
+                    User.findByIdAndRemove.yields(null, {...appConstants.TestAdminUser});
                     chai.request(newServer)
                         .delete(`/api/users/${adminUser.id}`)
                         .set('authorization', `${appConstants.Bearer} 123`)
