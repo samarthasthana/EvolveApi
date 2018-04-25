@@ -303,7 +303,6 @@ describe('Users', () => {
                 it('deletes the user correctly', (done) => {
                     jwt.verify.yields(null, { user: adminUser });
                     User.findByIdAndRemove.yields(null, {...appConstants.TestAdminUser});
-
                     chai.request(newServer)
                         .delete(`/api/users/${adminUser.id}`)
                         .set('authorization', `${appConstants.Bearer} 123`)
